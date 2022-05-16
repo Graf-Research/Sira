@@ -1,0 +1,30 @@
+{
+  "name": "sira-lang",
+  "version": "1.0.0",
+  "description": "Sira Programming Language",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node -O '{\"module\":\"commonjs\"}' src/main",
+    "compile-grammar": "mkdir -p grammar/compiled && nearleyc grammar/sira.ne -o grammar/compiled/sira.js"
+  },
+  "keywords": [
+    "programming",
+    "language",
+    "proglang",
+    "sira",
+    "business",
+    "user",
+    "interface",
+    "ui",
+    "ux"
+  ],
+  "author": "Rio Chandra Rajagukguk",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/nearley": "^2.11.2",
+    "@types/node": "^17.0.33",
+    "nearley": "^2.20.1",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.4"
+  }
+}
