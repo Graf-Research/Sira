@@ -42,6 +42,11 @@ Install dependencies
 npm install
 ```
 
+Compile Grammar
+```
+npm run compile-grammar
+```
+
 Test Parser
 ```
 npm test
