@@ -4,7 +4,7 @@ Sira is a mini programming language with purpose of building web user interface 
 
 Sira use query-heavy based approach for data transaction. Each data transaction query need to be defined outside system to support Sira system.
 
-Syntax use tab-stricted syntax using two spaces as tab.
+Syntax use indentation-strict syntax using two spaces as indentation.
 
 ## Table of Contents
 * [How to](#how-to)
