@@ -401,7 +401,7 @@ goto List User (
 
 ### Confirm
 
-Confirm shows confirmation dialog with label/text as parameter. If confirm cancelled by user all statement following executions will not be executed.
+Confirm shows confirmation dialog with label/text as parameter. If confirm cancelled by user all following statement executions will not be executed.
 
 ```
 page My First Page
