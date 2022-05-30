@@ -1,3 +1,5 @@
+@include "./lexer.ne"
+
 main -> main __n page {% d => [...d[0], d[2]] %}
   | page
 

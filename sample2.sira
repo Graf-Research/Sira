@@ -1,0 +1,202 @@
+page Daftar Produk
+  [data]
+    table daftar_produk = query 'Lihat semua produk'
+
+  [view]
+    table(daftar_produk) Daftar Produk
+      - ID: daftar_produk.id text
+      - Nama: daftar_produk.nama text
+      - Harga: daftar_produk.harga numeric
+      - Deskripsi: daftar_produk.deskripsi bigtext
+      - Ubah {
+        goto Ubah Produk ($id = daftar_produk.id)
+      }
+
+page Ubah Produk
+  [param]
+    $id
+
+  [data]
+    row produk = query 'Produk by id' ($1 = $id)
+
+  [view]
+    form Detail Produk
+      - Nama: produk.nama text
+      - Harga: produk.harga numeric
+      - Deskripsi: produk.deskripsi bigtext
+
+    button Simpan {
+      query 'Ubah produk by id' (
+        $1 = $id, 
+        $2 = produk.nama, 
+        $3 = produk.harga, 
+        $4 = produk.deskripsi
+      )
+      alert Berhasil
+      goto Ubah Produk ($id = $id)
+    }
+
+page Tambah Produk
+  [data]
+    row produk = ()
+
+  [view]
+    form Produk Baru
+      - Nama: produk.nama text
+      - Harga: produk.harga numeric
+      - Deskripsi: produk.deskripsi bigtext
+
+    button Simpan {
+      row produk = query 'Tambah Produk' (
+        $1 = produk.nama, 
+        $3 = produk.harga, 
+        $2 = produk.deskripsi
+      )
+      alert Berhasil menambahkan produk
+      goto Ubah Produk ($id = produk.id)
+    }
+
+page Daftar Meja
+  [data]
+    table daftar_meja = query 'Lihat semua meja'
+
+  [view]
+    table(daftar_meja) Daftar Meja
+      - ID: daftar_meja.id text
+      - Nomor: daftar_meja.nomor text
+      - Fasilitas: daftar_meja.fasilitas bigtext
+      - Ubah {
+        goto Ubah Meja ($id = daftar_meja.id)
+      }
+
+page Ubah Meja
+  [param]
+    $id
+
+  [data]
+    row meja = query 'Meja by id' ($1 = $id)
+
+  [view]
+    form Detail Meja
+      - Nomor: meja.nomor text
+      - Fasilitas: meja.fasilitas bigtext
+
+    button Simpan {
+      query 'Ubah meja by id' (
+        $1 = $id, 
+        $2 = meja.nomor, 
+        $3 = meja.fasilitas
+      )
+      alert Berhasil
+      goto Ubah Meja ($id = $id)
+    }
+
+page Tambah Meja
+  [data]
+    row meja = ()
+
+  [view]
+    form Meja Baru
+      - Nomor: meja.nomor text
+      - Fasilitas: meja.fasilitas bigtext
+
+    button Simpan {
+      row meja = query 'Tambah Meja' (
+        $1 = meja.nomor, 
+        $2 = meja.fasilitas
+      )
+      alert Berhasil menambahkan meja
+      goto Ubah Meja ($id = meja.id)
+    }
+
+page Daftar Order
+  [data]
+    table daftar_order = query 'Lihat semua order'
+
+  [view]
+    table(daftar_order) Daftar Order
+      - ID: daftar_order.id text
+      - Nomor Meja: daftar_order.nomor text
+      - Tanggal Transaksi: daftar_order.tanggal_transaksi text
+      - Jumlah Item: daftar_order.jumlah_item text
+      - Item Pesanan: daftar_order.item_pesanan text
+      - Ubah {
+        goto Ubah Order ($id = daftar_order.id)
+      }
+
+page Tambah Order
+  [data]
+    table daftar_meja = query 'Opsi Meja'
+    table daftar_produk = query 'Opsi Produk'
+    table daftar_karyawan = query 'Opsi Karyawan'
+    row order = ()
+    table daftar_detail_order = []
+
+  [view]
+    form Order Baru
+      - Meja: order.meja_id dropdown(daftar_meja)
+      - PIC Karyawan: order.diinput_oleh dropdown(daftar_karyawan)
+    
+    multiform(daftar_detail_order) Detail Order
+      - Produk: daftar_detail_order.produk_id dropdown(daftar_produk)
+      - Jumlah: daftar_detail_order.kuantitas numeric
+      - Diskon: daftar_detail_order.diskon numeric
+
+    button Buat Order {
+      row order = query 'Buat order' (
+        $1 = order.meja_id, 
+        $2 = order.diinput_oleh
+      )
+      query 'Buat Detail Order' (daftar_detail_order)[
+        $2 = order.id, 
+        $1 = daftar_detail_order.produk_id, 
+        $3 = daftar_detail_order.kuantitas, 
+        $4 = daftar_detail_order.diskon
+      ]
+      alert Berhasil menambahkan order
+      goto Daftar Order ()
+    }
+
+page Ubah Order
+  [param]
+    $id
+
+  [data]
+    table daftar_meja = query 'Opsi Meja'
+    table daftar_produk = query 'Opsi Produk'
+    table daftar_karyawan = query 'Opsi Karyawan'
+    row order = query 'Lihat order by id' ($1 = $id)
+    table daftar_detail_order = query 'Lihat semua detail order by order id' ($1 = $id)
+
+  [view]
+    form Order Baru
+      - Meja: order.meja_id dropdown(daftar_meja)
+      - PIC Karyawan: order.diinput_oleh dropdown(daftar_karyawan)
+    
+    multiform(daftar_detail_order) Detail Order
+      - Produk: daftar_detail_order.produk_id dropdown(daftar_produk)
+      - Jumlah: daftar_detail_order.kuantitas numeric
+      - Diskon: daftar_detail_order.diskon numeric
+
+    button Simpan {
+      query 'Update order by id' (
+        $1 = $id, 
+        $2 = order.meja_id, 
+        $3 = order.diinput_oleh
+      )
+      query 'hapus seluruh detail order by order id' ($1 = $id)
+      query 'Buat Detail Order' (daftar_detail_order)[
+        $2 = order.id, 
+        $1 = daftar_detail_order.produk_id, 
+        $3 = daftar_detail_order.kuantitas, 
+        $4 = daftar_detail_order.diskon
+      ]
+      alert Berhasil mengubah order
+      goto Daftar Order
+    }
+
+    button Hapus Order {
+      confirm Yakin menghapus order ini?
+      query 'Hapus order by id' ($1 = $id)
+      goto Daftar Order
+    }
