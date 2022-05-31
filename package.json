@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run compile-grammar && npm run run-test",
     "run-test": "ts-node -O '{\"module\":\"commonjs\"}' src/main",
-    "compile-grammar": "mkdir -p grammar/compiled && nearleyc grammar/sira2.ne -o grammar/compiled/sira.js"
+    "compile-grammar": "mkdir -p grammar/compiled && nearleyc grammar/sira.ne -o grammar/compiled/sira.js"
   },
   "keywords": [
     "programming",

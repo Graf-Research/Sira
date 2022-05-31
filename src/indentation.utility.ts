@@ -6,8 +6,9 @@ export function injectIndent(lines: string, indent_size: number = 2): string {
   const list_output_line: string[] = [];
   const list_line = lines.split('\n');
   for (let i = 0; i < list_line.length; i++) {
-    const line: string = list_line[i];
+    let line: string = list_line[i];
     if (line.trim().length === 0) {
+      list_output_line.push('');
       continue;
     }
     
@@ -19,7 +20,7 @@ export function injectIndent(lines: string, indent_size: number = 2): string {
     const leading_indent_size = leading_indent_count / indent_size;
     let indent_change = 0;
     for (let j = indent_counter; j < leading_indent_size; j++) {
-      list_output_line.push(INDENT);
+      line = INDENT + line.trim();
       indent_change++;
     }
 
@@ -28,7 +29,7 @@ export function injectIndent(lines: string, indent_size: number = 2): string {
     }
 
     for (let j = leading_indent_size; j < indent_counter; j++) {
-      list_output_line.push(DEDENT);
+      line = DEDENT + line.trim();
       indent_change--;
     }
 

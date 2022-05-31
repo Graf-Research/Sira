@@ -3,10 +3,37 @@ page Daftar Produk
     $id
 
   [data]
-    row a = ()
-    table c = query 'aaa' ($1 = aa.cc)
+    table daftar_meja = query 'Opsi Meja'
+    table daftar_produk = query 'Opsi Produk'
+    table daftar_karyawan = query 'Opsi Karyawan'
+    row order = ()
+    table daftar_detail_order = []
 
   [view]
+
+    button Buat Order {
+      row order = query 'Buat order' (
+        $1 = order.meja_id, 
+        $2 = order.diinput_oleh
+      )
+      query 'Buat Detail Order' (source=daftar_detail_order)[
+        $5 = $id,
+        $2 = order.id, 
+        $1 = daftar_detail_order.produk_id, 
+        $3 = daftar_detail_order.kuantitas, 
+        $4 = daftar_detail_order.diskon
+      ]
+      alert Berhasil menambahkan order
+      goto Daftar Order
+    }
+
+    multiform Produk Baru (source=c)
+      - Nama: produk.nama text
+      - Harga: produk.harga numeric
+      - Deskripsi: produk.deskripsi bigtext
+      - Meja: order.meja_id dropdown(source=daftar_meja)
+      - PIC Karyawan: order.diinput_oleh dropdown(source =daftar_karyawan)
+
     table Test Rio aaa  (source = aa)
       - ID: data.id text
       - Ubah {
@@ -15,3 +42,7 @@ page Daftar Produk
         alert AAAAAaaa AAAA
         confirm are you sure?
       }
+
+
+
+

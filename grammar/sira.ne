@@ -1,267 +1,260 @@
 @include "./lexer.ne"
 
-main -> main __n page {% d => [...d[0], d[2]] %}
-  | page
+__MAIN__ -> page {% id %}
 
-# main page
-page -> "page" __ allowed_string __n indent __n page_items __n dedent _n {% d => ({
-  title: d[2],
-  items: d[6]
-}) %}
-page_items -> page_items __n page_item {% d => [...d[0], d[2]] %}
-  | page_item
-page_item -> view_section {% id %}
-  | data_section {% id %}
-  | param_section {% id %}
+# Page
+page -> %keywords_page %ws STR OPEN_TAG sections CLOSE_TAG {% d => ({
+    title: d[2],
+    sections: d[4]
+  }) %}
 
-# view section
-view_section -> "[view]" __n indent __n view_items __n dedent _n {% d => ({
-  type: 'view',
-  items: d[4]
-}) %}
-view_items -> view_items __n view_item {% d => [...d[0], d[2]] %}
-  | view_item
-view_item -> button {% id %}
-  | single_form {% id %}
-  | multiple_form {% id %}
-  | table {% id %}
+# Sections
+sections -> sections section {% d => [...d[0], d[1]] %}
+  | section
 
-# data section
-data_section -> "[data]" __n indent __n data_items __n dedent _n {% d => ({
-  type: 'data',
-  items: d[4]
-}) %}
-data_items -> data_items __n data_item {% d => [...d[0], d[2]] %}
-  | data_item
-data_item -> row_data_empty {% id %}
-  | row_data_query {% id %}
-  | table_data_empty {% id %}
-  | table_data_query {% id %}
+# Section
+section -> section_param {% d => ({
+    type: 'param',
+    data: d[0]
+  }) %}
+  | section_data {% d => ({
+    type: 'data',
+    data: d[0]
+  }) %}
+  | section_view {% d => ({
+    type: 'view',
+    data: d[0]
+  }) %}
 
-# data item
-row_data_empty -> "row" __ allowed_variable _ "=" _ empty_row_data {% d => ({
-  type: 'variable-assignment',
-  kind: 'empty-row',
-  variable: d[2],
-  value: '()'
-}) %}
-row_data_query -> "row" __ allowed_variable _ "=" _ query_call {% d => ({
-  type: 'variable-assignment',
-  kind: 'call-query-result-row',
-  variable: d[2],
-  value: {
-    ...d[6],
-    query: {
-      ...d[6].query,
-      type: 'row'
+# Section > Param
+section_param -> %keywords_section_param OPEN_TAG params CLOSE_TAG {% d => d[2] %}
+params -> params %nl %param {% d => [...d[0], d[2]] %}
+  | %param
+
+# Section > Data
+section_data -> %keywords_section_data OPEN_TAG datas CLOSE_TAG {% d => d[2] %}
+datas -> datas %nl data {% d => [...d[0], d[2]] %}
+  | data
+data -> variable_assignment {% id %}
+
+# Section > View
+section_view -> %keywords_section_view OPEN_TAG views CLOSE_TAG {% d => d[2] %}
+views -> views %nl:? view {% d => [...d[0], d[2]] %}
+  | view
+view -> view_component {% id %}
+
+# View Component
+view_component -> vc_table {% d => ({
+    type: 'table',
+    data: d[0]
+  }) %}
+  | vc_multiform {% d => ({
+    type: 'multiform',
+    data: d[0]
+  }) %}
+  | vc_form {% d => ({
+    type: 'form',
+    data: d[0]
+  }) %}
+  | vc_button {% d => ({
+    type: 'button',
+    data: d[0]
+  }) %}
+
+# View Component > Button
+vc_button -> %keywords_button %ws STR %ws:? %open_bracket OPEN_TAG statements CLOSE_TAG %close_bracket {% d => ({
+    label: d[2],
+    statements: d[6]
+  }) %}
+
+# View Component > Multiform
+vc_multiform -> %keywords_multiform %ws STR %ws:? data_source OPEN_TAG vc_form_items CLOSE_TAG {% d => ({
+    name: d[2],
+    source_target: d[4],
+    items: d[6]
+  }) %}
+
+# View Component > Form
+vc_form -> %keywords_form %ws STR OPEN_TAG vc_form_items CLOSE_TAG {% d => ({
+    name: d[2],
+    items: d[4]
+  }) %}
+vc_form_items -> vc_form_items %nl vc_form_item {% d=> [...d[0], d[2]] %}
+  | vc_form_item
+vc_form_item -> %item_begin %ws:? STR %ws:? %colon %ws:? variable_access %ws form_type {% d => ({
+    label: d[2],
+    source_target: {
+      variable: d[6],
+      ...d[8]
     }
-  }
-}) %}
-table_data_empty -> "table" __ allowed_variable _ "=" _ empty_table_data {% d => ({
-  type: 'variable-assignment',
-  kind: 'empty-table',
-  variable: d[2],
-  value: '[]'
-}) %}
-table_data_query -> "table" __ allowed_variable _ "=" _ query_call {% d => ({
-  type: 'variable-assignment',
-  kind: 'call-query-result-table',
-  variable: d[2],
-  value: {
-    ...d[6],
-    query: {
-      ...d[6].query,
-      type: 'table'
-    }
-  }
-}) %}
+  }) %}
+form_type -> %keywords_type_text {% d => ({
+    type: 'text'
+  }) %}
+  | %keywords_type_bigtext {% d => ({
+    type: 'bigtext'
+  }) %}
+  | %keywords_type_numeric {% d => ({
+    type: 'numeric'
+  }) %}
+  | form_type_dropdown {% d => ({
+    type: 'dropdown',
+    source: d[0]
+  }) %}
+  | form_type_radio {% d => ({
+    type: 'radio',
+    source: d[0]
+  }) %}
+form_type_dropdown -> %keywords_dropdown %ws:? data_source {% d => d[2] %}
+form_type_radio -> %keywords_radio %ws:? data_source {% d => d[2] %}
 
-# empty data item
-empty_row_data -> "()" {% id %}
-empty_table_data -> "[]" {% id %}
+# View Component > Table
+vc_table -> %keywords_table %ws STR %ws data_source OPEN_TAG vc_table_items CLOSE_TAG {% d => ({
+    name: d[2],
+    source: d[4],
+    items: d[6]
+  }) %}
 
-# param section
-param_section -> "[param]" __n indent __n param_items __n dedent _n {% d => ({
-  type: 'param',
-  variable: d[4]
-}) %}
-param_items -> param_items __n param_item {% d => [...d[0], d[2]] %}
-  | param_item
-param_item -> param {% id %}
-
-# button
-button -> "button" _ allowed_string __ "{" _ __n indent __n statements __n dedent __n _ "}" {% d => ({
-  type: 'button',
-  label: d[2],
-  statements: d[9]
-}) %}
-
-# table
-table -> table_header _n indent _n table_items _n dedent {% d => ({
-  type: 'table',
-  label: d[0].title,
-  data_source_variable: d[0].data_source_variable,
-  items: d[4]
-}) %}
-table_header -> "table" _ "(" _ allowed_variable _ ")" _ allowed_string {% d => ({
-  title: d[0],
-  data_source_variable: d[4]
-}) %}
-table_items -> table_items __n table_item {% d => [...d[0], d[2]] %}
-  | table_item
-table_item -> form_item_input_casual {% id %}
-  | form_item_action {% id %}
+vc_table_items -> vc_table_items %nl vc_table_item {% d => [...d[0], d[2]] %}
+  | vc_table_item
+vc_table_item -> vc_table_item_cell {% d => ({
+    type: 'cell',
+    data: d[0]
+  }) %}
+  | vc_table_item_button {% d => ({
+    type: 'button',
+    data: d[0]
+  }) %}
+vc_table_item_cell -> %item_begin %ws:? STR %ws:? %colon %ws:? variable_access %ws table_type {% d => ({
+    label: d[2],
+    source: {
+      variable: d[6],
+      type: d[8]
+    },
+  }) %}
+vc_table_item_button -> %item_begin %ws:? STR %ws:? %open_bracket OPEN_TAG statements CLOSE_TAG %close_bracket {% d => ({
+    label: d[2],
+    statements: d[6]
+  }) %}
+table_type -> %keywords_type_text {% id %}
+  | %keywords_type_bigtext {% id %}
+  | %keywords_type_numeric {% id %}
 
 
-# form
-single_form -> single_form_header _n indent _n form_items _n dedent {% d => ({
-  type: 'form',
-  title: d[0],
-  items: d[4]
-}) %}
-multiple_form -> multi_form_header _n indent _n form_items _n dedent {% d => ({
-  type: 'multiform',
-  title: d[0].title,
-  data_source_variable: d[0].data_source_variable,
-  items: d[4]
-}) %}
-single_form_header -> "form" __ allowed_string {% d => d[2] %}
-multi_form_header -> "multiform" _ "(" _ allowed_variable _ ")" _ allowed_string {% d => ({
-  title: d[8],
-  data_source_variable: d[4]
-}) %}
-form_items -> form_items __n form_item {% d => [...d[0], d[2]] %}
-  | form_item
-form_item -> form_item_input_casual {% id %}
-  | form_item_input_dropdown {% id %}
-  | form_item_action {% id %}
-form_item_input_casual -> "-" __ allowed_string _ ":" _ possible_variable __ possible_form_type_casual {% d => ({
-  label: d[2],
-  variable: d[6],
-  type: d[8]
-}) %}
-form_item_input_dropdown -> "-" __ allowed_string _ ":" _ possible_variable __ "dropdown" _ "(" _ allowed_variable _ ")" {% d => ({
-  type: 'dropdown',
-  label: d[2],
-  variable: d[6],
-  dropdown_data_variable: d[12]
-}) %}
-form_item_action -> "-" __ allowed_string _ "{" _ __n indent __n statements __n dedent __n _ "}"  {% d => ({
-  type: 'button',
-  label: d[2],
-  statements: d[9]
-}) %}
+# Data Source
+data_source -> %open_parenthesis %ws:? %keywords_source %ws:? %equals %ws:? %variable %ws:? %close_parenthesis {% d => d[6] %}
 
-# form type
-possible_form_type_casual -> form_type_numeric {% id %}
-  | form_type_text {% id %}
-  | form_type_bigtext {% id %}
-
-form_type_numeric -> "numeric" {% id %}
-form_type_text -> "text" {% id %}
-form_type_bigtext -> "bigtext" {% id %}
-
-# action statements
-statements -> statements __n statement {% d => [...d[0], d[2]] %}
+# Statements
+statements -> statements %nl statement {% d => [...d[0], d[2]] %}
   | statement
-
-statement -> variable_assignment {% id %}
-  | query_call {% id %}
-  | alert {% id %}
-  | confirm {% id %}
-  | goto {% id %}
-
-# legal statement
-variable_assignment -> data_item {% id %}
-alert -> "alert" __ allowed_string {% d => ({
-  type: 'alert',
-  text: d[2]
-}) %}
-confirm -> "confirm" __ allowed_string {% d => ({
-  type: 'confirm',
-  text: d[2]
-}) %}
-goto -> "goto" __ allowed_string _ query_param {% d => ({
-  type: 'goto',
-  page: d[2],
-  params: d[4].values
-}) %}
-  | "goto" __ allowed_string {% d => ({
+statement -> query {% d => ({
+    type: 'query',
+    data: d[0]
+  }) %}
+  | variable_assignment {% d => ({
+    type: 'variable-assignment',
+    data: d[0]
+  }) %}
+  | goto {% d => ({
     type: 'goto',
+    data: d[0]
+  }) %}
+  | alert {% d => ({
+    type: 'alert',
+    data: d[0]
+  }) %}
+  | confirm {% d => ({
+    type: 'confirm',
+    data: d[0]
+  }) %}
+
+# Goto Page
+goto -> %keywords_goto %ws STR %ws params_with_parenthesis {% d => ({
+    page: d[2],
+    params: d[4]
+  }) %}
+  | %keywords_goto %ws STR {% d => ({
     page: d[2],
     params: []
   }) %}
-query_call -> "query" __ "'" allowed_string "'" _ query_param {% d => ({
-  type: 'call-query',
-  query: {
-    multirow: d[6].multirow,
-    data_source_variable: d[6].data_source_variable,
-    value: d[3]
-  },
-  params: d[6].values
-}) %}
-  | "query" __ "'" allowed_string "'" {% d => ({
-    type: 'call-query',
-    query: {
-      multirow: false,
-      value: d[3]
-    },
+
+# Alert
+alert -> %keywords_alert %ws STR {% d => d[2] %}
+
+# Confirm
+confirm -> %keywords_confirm %ws STR {% d => d[2] %}
+
+# Variable Assignment
+variable_assignment -> %keywords_row %ws %variable %ws:? %equals %ws:? query {% d => ({
+    type: 'query-row',
+    variable: d[2],
+    value: d[6]
+  }) %}
+  | %keywords_row %ws %variable %ws:? %equals %ws:? %empty_row {% d => ({
+    type: 'empty-row',
+    variable: d[2],
+  }) %}
+  | %keywords_table %ws %variable %ws:? %equals %ws:? query {% d => ({
+    type: 'query-table',
+    variable: d[2],
+    value: d[6]
+  }) %}
+  | %keywords_table %ws %variable %ws:? %equals %ws:? %empty_table {% d => ({
+    type: 'empty-table',
+    variable: d[2],
+  }) %}
+
+# Query
+query -> query_no_params %ws params_with_parenthesis {% d => ({
+    ...d[0],
+    type: 'single-row-params',
+    params: d[2]
+  }) %}
+  | query_no_params %ws:? data_source %ws:? params_with_sq_brackets {% d => ({
+    ...d[0],
+    type: 'multi-row-params',
+    source: d[2],
+    params: d[4]
+  }) %}
+  | query_no_params {% id %}
+query_no_params -> %keywords_query %ws %single_quote STR %single_quote {% d => ({
+    type: 'empty-params',
+    keyword: d[0],
+    query: d[3],
     params: []
   }) %}
 
-# query
-query_param -> "(" _id query_param_assign_values _id ")" {% d => ({
-  multirow: false,
-  values: d[2]
-}) %}
-  | "(" _ ")" {% d => ({
-    multirow: false,
-    values: []
-  }) %}
-  | "(" _ allowed_variable _ ")" _ "[" _id query_param_assign_values _id "]" {% d => ({
-    data_source_variable: d[2],
-    multirow: true,
-    values: d[8]
-  }) %}
-
-query_param_assign_values -> query_param_assign_values _id "," _id query_param_assign_value {% d => [...d[0], d[4]] %} 
-  | query_param_assign_value
-
-query_param_assign_value -> query_param_variable {% id %}
-  | query_param_param {% id %}
-
-query_param_variable -> param _ "=" _ possible_variable {% d => ({
-  param: d[0],
-  assign_value: {
-    type: 'variable',
-    value: d[4]
-  }
-}) %}
-query_param_param -> param _ "=" _ param {% d => ({
-  param: d[0],
-  assign_value: {
+# Param
+params_with_sq_brackets -> %open_sq_bracket _wl_ params _wl_ %close_sq_bracket {% d => d[2] %}
+  | %empty_row {% d => [] %}
+params_with_parenthesis -> %open_parenthesis _wl_ params _wl_ %close_parenthesis {% d => d[2] %}
+  | %empty_row {% d => [] %}
+params -> params _wl_ %comma _wl_ param {% d => [...d[0], d[4]] %}
+  | param
+param -> %param %ws:? %equals %ws:? %param {% d => ({
     type: 'param',
+    variable: d[0],
     value: d[4]
-  }
-}) %}
+  }) %}
+  | %param %ws:? %equals %ws:? variable_access {% d => ({
+    type: 'variable-access',
+    variable: d[0],
+    value: d[4]
+  }) %}
 
-# variable and basics
-possible_variable -> possible_variable "." allowed_variable  {% d => [...d[0], d[2]] %}
-  | allowed_variable
+# Variable Access
+variable_access -> %variable %dot %variable {% d => ({
+    table: d[0],
+    column: d[2]
+  }) %}
 
-allowed_variable -> [A-Za-z_] [A-Za-z0-9_]:* {% d => d[0] + d[1].join('') %}
-allowed_string -> allowed_string __ allowed_word {% d => d[0] + ' ' + d[2] %}
-  | allowed_word {% id %}
-allowed_word -> [A-Za-z_] [A-Za-z0-9_?-\\\/!@#$%^&*]:* {% d => d[0] + d[1].join('') %}
-param -> "$" [A-Za-z0-9_]:* {% d => d[1].join('') %}
+# Allowed String/Word
+STR -> STR %ws WRD {% d => d[0] + ' ' + d[2] %}
+  | WRD {% id %}
+WRD -> [A-Za-z_] [A-Za-z0-9_?-\\\/!@#$%^&*]:* {% d => d[0] + d[1].join('') %}
 
-_id -> ([\s\n] | indent | dedent):*
-__id -> ([\s\n] | indent | dedent):+
+# Open/Close Tag
+OPEN_TAG -> %nl %indent %nl:?
+CLOSE_TAG -> %nl %dedent
 
-indent -> "\u27F6"
-dedent -> "\u27F5"
-
-_n -> [\n]:*
-__n -> [\n]:+
-_ -> [ ]:*
-__ -> [ ]:+
+_wl_ -> (%ws | %nl | %indent | %dedent):*

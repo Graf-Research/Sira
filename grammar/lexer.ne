@@ -29,6 +29,22 @@ const keywords_table = [
   'table', 'Table',
 ];
 
+const keywords_form = [
+  'form', 'Form',
+];
+
+const keywords_multiform = [
+  'multiform', 'Multiform', 'MultiForm',
+];
+
+const keywords_dropdown = [
+  'dropdown', 'Dropdown',
+];
+
+const keywords_radio = [
+  'radio', 'Radio',
+];
+
 const keywords_source = [
   'source', 'Source',
 ];
@@ -45,12 +61,20 @@ const keywords_confirm = [
   'confirm', 'Confirm',
 ];
 
-const keywords_view_component = [
-  'form', 'Form',
-  'multiform', 'Multiform',
+const keywords_button = [
   'button', 'Button',
-  'alert', 'Alert',
-  'confirm', 'Confirm',
+];
+
+const keywords_type_text = [
+  'text', 'Text'
+];
+
+const keywords_type_bigtext = [
+  'bigtext', 'Bigtext', 'BigText'
+];
+
+const keywords_type_numeric = [
+  'numeric', 'Numeric'
 ];
 
 const lexer = moo.compile({
@@ -66,14 +90,26 @@ const lexer = moo.compile({
   keywords_section_data,
   keywords_section_view,
   parenthesis: {
-    match: /[\(\)\[\]\{\}]+/,
+    match: /[\(\)]+/,
     type: moo.keywords({
+      empty_row: '()',
       open_parenthesis: '(',
       close_parenthesis: ')',
-      empty_row: '()',
-      empty_table: '[]',
+    })
+  },
+  brackets: {
+    match: /[\{\}]+/,
+    type: moo.keywords({
       open_bracket: '{',
       close_bracket: '}',
+    })
+  },
+  sq_brackets: {
+    match: /[\[\]]+/,
+    type: moo.keywords({
+      empty_table: '[]',
+      open_sq_bracket: '[',
+      close_sq_bracket: ']',
     })
   },
   equals: /\=/,
@@ -86,12 +122,19 @@ const lexer = moo.compile({
       keywords_page,
       keywords_row,
       keywords_table,
-      keywords_view_component,
       keywords_query,
       keywords_source,
       keywords_goto,
       keywords_alert,
-      keywords_confirm
+      keywords_confirm,
+      keywords_type_text,
+      keywords_type_bigtext,
+      keywords_type_numeric,
+      keywords_form,
+      keywords_dropdown,
+      keywords_radio,
+      keywords_button,
+      keywords_multiform
     })
   },
   any: /.+/
