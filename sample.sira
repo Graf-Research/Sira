@@ -16,7 +16,7 @@ page Daftar Produk
         $1 = order.meja_id, 
         $2 = order.diinput_oleh
       )
-      query 'Buat Detail Order' (source=daftar_detail_order)[
+      query 'Buat Detail Order' (source =   daftar_detail_order) [
         $5 = $id,
         $2 = order.id, 
         $1 = daftar_detail_order.produk_id, 

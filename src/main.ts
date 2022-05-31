@@ -1,6 +1,6 @@
-import nearley from "nearley";
+import * as nearley from "nearley";
 import { injectIndent } from "./indentation.utility";
-import fs from 'fs';
+import * as fs from 'fs';
 import { PageSection, SectionData, SectionParam, SectionView, SiraPage } from "./new-sira.interface";
 
 export class SiraParser {
@@ -47,7 +47,7 @@ export class SiraParser {
 const parser = new SiraParser();
 try {
   const source_code = fs.readFileSync('./sample.sira', 'utf8');
-  parser.parse(source_code + '\n');
+  parser.parse(source_code);
   console.log(JSON.stringify(parser.getViews()[0].data[0], null, 2));
 } catch (e: any) {
   console.log(parser.log);
