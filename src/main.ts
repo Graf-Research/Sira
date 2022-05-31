@@ -1,6 +1,5 @@
 import * as nearley from "nearley";
 import { injectIndent } from "./indentation.utility";
-import * as fs from 'fs';
 import { SiraIntermediate } from "./intermediate.interface";
 import { ItemForm, ItemTable, ItemTableCell, PageSection, Param, ParamByParam, ParamByVariableAccess, Query, QueryEmptyParams, QueryMultiRowParams, QuerySingleRowParams, SectionData, SectionParam, SectionView, SiraPage, SourceTargetBigText, SourceTargetDropdown, SourceTargetNumber, SourceTargetRadio, SourceTargetText, Statement, StatementAlert, StatementConfirm, StatementGoto, StatementQuery, StatementVariableAssignment, VariableAssignment, VariableAssignmentByEmptyRow, VariableAssignmentByEmptyTable, VariableAssignmentByQueryRow, VariableAssignmentByQueryTable, ViewComponentButton, ViewComponentForm, ViewComponentTable } from "./sira.interface";
 
@@ -271,15 +270,4 @@ export class SiraParser {
     }
     return this.result.sections.filter((ps: PageSection) => ps.type === 'data') as SectionData[];
   }
-}
-
-const parser = new SiraParser();
-try {
-  const source_code = fs.readFileSync('./sample.sira', 'utf8');
-  parser.parse(source_code);
-  // console.log(JSON.stringify(parser.getViews()[0].data[0], null, 2));
-  console.log(JSON.stringify(parser.result, null, 2));
-} catch (e: any) {
-  console.log(parser.log);
-  console.log(e);
 }
