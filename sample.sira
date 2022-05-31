@@ -10,7 +10,6 @@ page Daftar Produk
     table daftar_detail_order = []
 
   [view]
-
     button Buat Order {
       row order = query 'Buat order' (
         $1 = order.meja_id, 
