@@ -251,7 +251,7 @@ variable_access -> %variable %dot %variable {% d => ({
 # Allowed String/Word
 STR -> STR %ws WRD {% d => d[0] + ' ' + d[2] %}
   | WRD {% id %}
-WRD -> [A-Za-z_] [A-Za-z0-9_?-\\\/!@#$%^&*]:* {% d => d[0] + d[1].join('') %}
+WRD -> ([A-Za-z_] | %number) ([A-Za-z0-9_?-\\\/!@#$%^&*] | %number):* {% d => d[0] + d[1].join('') %}
 
 # Open/Close Tag
 OPEN_TAG -> %nl %indent %nl:?

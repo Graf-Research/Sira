@@ -85,7 +85,6 @@ const lexer = moo.compile({
   ws: /[ \t]+/,
   nl: { match: /\n+/, lineBreaks: true },
   item_begin: /[\-]/,
-  number: /[0-9]+/,
   comma: /\,/,
   dot: /\./,
   colon: /\:/,
@@ -141,6 +140,7 @@ const lexer = moo.compile({
       keywords_multiform
     })
   },
+  number: /[0-9]+/,
   any: /.+/
 });
 var grammar = {
@@ -415,9 +415,13 @@ var grammar = {
         }) },
     {"name": "STR", "symbols": ["STR", (lexer.has("ws") ? {type: "ws"} : ws), "WRD"], "postprocess": d => d[0] + ' ' + d[2]},
     {"name": "STR", "symbols": ["WRD"], "postprocess": id},
+    {"name": "WRD$subexpression$1", "symbols": [/[A-Za-z_]/]},
+    {"name": "WRD$subexpression$1", "symbols": [(lexer.has("number") ? {type: "number"} : number)]},
     {"name": "WRD$ebnf$1", "symbols": []},
-    {"name": "WRD$ebnf$1", "symbols": ["WRD$ebnf$1", /[A-Za-z0-9_?-\\\/!@#$%^&*]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "WRD", "symbols": [/[A-Za-z_]/, "WRD$ebnf$1"], "postprocess": d => d[0] + d[1].join('')},
+    {"name": "WRD$ebnf$1$subexpression$1", "symbols": [/[A-Za-z0-9_?-\\\/!@#$%^&*]/]},
+    {"name": "WRD$ebnf$1$subexpression$1", "symbols": [(lexer.has("number") ? {type: "number"} : number)]},
+    {"name": "WRD$ebnf$1", "symbols": ["WRD$ebnf$1", "WRD$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "WRD", "symbols": ["WRD$subexpression$1", "WRD$ebnf$1"], "postprocess": d => d[0] + d[1].join('')},
     {"name": "OPEN_TAG$ebnf$1", "symbols": [(lexer.has("nl") ? {type: "nl"} : nl)], "postprocess": id},
     {"name": "OPEN_TAG$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "OPEN_TAG", "symbols": [(lexer.has("nl") ? {type: "nl"} : nl), (lexer.has("indent") ? {type: "indent"} : indent), "OPEN_TAG$ebnf$1"]},

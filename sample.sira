@@ -1,47 +1,25 @@
-page Daftar Produk
-  [param]
-    $id
-
+page 222 Add Postings   2
   [data]
-    table daftar_meja = query 'Opsi Meja'
-    table daftar_produk = query 'Opsi Produk'
-    table daftar_karyawan = query 'Opsi Karyawan'
-    row order = ()
-    table daftar_detail_order = []
+    table user_options = query 'user options'
+    table postings = []
+    row temp = ()
 
   [view]
-    button Buat Order {
-      row order = query 'Buat order' (
-        $1 = order.meja_id, 
-        $2 = order.diinput_oleh
-      )
-      query 'Buat Detail Order' (source =   daftar_detail_order) [
-        $5 = $id,
-        $2 = order.id, 
-        $1 = daftar_detail_order.produk_id, 
-        $3 = daftar_detail_order.kuantitas, 
-        $4 = daftar_detail_order.diskon
+    form Choose User
+      - User: temp.user_id dropdown (source = user_options)
+
+    multiform List Posting (source = postings)
+      - Title: postings.title text
+      - Content: postings.content bigtext
+      - Number: postings.z numeric
+
+    button Post {
+      confirm Yakin?
+      query 'insert postings' (source = postings) [
+        $1 = temp.user_id,
+        $2 = postings.title,
+        $3 = postings.content
       ]
-      alert Berhasil menambahkan order
-      goto Daftar Order
+      alert Berhasil
+      goto All Posting
     }
-
-    multiform Produk Baru (source=c)
-      - Nama: produk.nama text
-      - Harga: produk.harga numeric
-      - Deskripsi: produk.deskripsi bigtext
-      - Meja: order.meja_id dropdown(source=daftar_meja)
-      - PIC Karyawan: order.diinput_oleh dropdown(source =daftar_karyawan)
-
-    table Test Rio aaa  (source = aa)
-      - ID: data.id text
-      - Ubah {
-        query 'AAAA'
-        table x = []
-        alert AAAAAaaa AAAA
-        confirm are you sure?
-      }
-
-
-
-
