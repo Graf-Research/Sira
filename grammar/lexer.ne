@@ -21,6 +21,10 @@ const keywords_section_view = [
   '[view]', '[View]',
 ];
 
+const keywords_cell = [
+  'cell', 'Cell',
+];
+
 const keywords_row = [
   'row', 'Row',
 ];
@@ -77,9 +81,22 @@ const keywords_type_numeric = [
   'numeric', 'Numeric'
 ];
 
+const keywords_type_date = [
+  'date', 'Date'
+];
+
+const keywords_type_time = [
+  'time', 'Time'
+];
+
+const keywords_type_datetime = [
+  'datetime', 'DateTime', 'Datetime'
+];
+
 const lexer = moo.compile({
   ws: /[ \t]+/,
   nl: { match: /\n+/, lineBreaks: true },
+  string: /"(?:\\["\\]|[^\n"\\])*"/,
   item_begin: /[\-]/,
   comma: /\,/,
   dot: /\./,
@@ -119,6 +136,7 @@ const lexer = moo.compile({
     match: /[a-zA-Z_][a-zA-Z0-9_]*/,
     type: moo.keywords({
       keywords_page,
+      keywords_cell,
       keywords_row,
       keywords_table,
       keywords_query,
@@ -133,7 +151,10 @@ const lexer = moo.compile({
       keywords_dropdown,
       keywords_radio,
       keywords_button,
-      keywords_multiform
+      keywords_multiform,
+      keywords_type_datetime,
+      keywords_type_date,
+      keywords_type_time
     })
   },
   number: /[0-9]+/,

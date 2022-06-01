@@ -97,6 +97,15 @@ form_type -> %keywords_type_text {% d => ({
   | %keywords_type_numeric {% d => ({
     type: 'numeric'
   }) %}
+  | %keywords_type_datetime {% d => ({
+    type: 'datetime'
+  }) %}
+  | %keywords_type_date {% d => ({
+    type: 'date'
+  }) %}
+  | %keywords_type_time {% d => ({
+    type: 'time'
+  }) %}
   | form_type_dropdown {% d => ({
     type: 'dropdown',
     source: d[0]
@@ -185,10 +194,28 @@ alert -> %keywords_alert %ws STR {% d => d[2] %}
 confirm -> %keywords_confirm %ws STR {% d => d[2] %}
 
 # Variable Assignment
-variable_assignment -> %keywords_row %ws %variable %ws:? %equals %ws:? query {% d => ({
+variable_assignment -> %keywords_cell %ws %variable %ws:? %equals %ws:? %string {% d => ({
+    type: 'string-cell',
+    variable: d[2],
+    value: d[6]
+  }) %}
+  | %keywords_cell %ws %variable %ws:? %equals %ws:? %number {% d => ({
+    type: 'numeric-cell',
+    variable: d[2],
+    value: d[6]
+  }) %}
+  | %keywords_cell %ws %variable {% d => ({
+    type: 'empty-cell',
+    variable: d[2],
+  }) %}
+  | %keywords_row %ws %variable %ws:? %equals %ws:? query {% d => ({
     type: 'query-row',
     variable: d[2],
     value: d[6]
+  }) %}
+  | %keywords_row %ws %variable {% d => ({
+    type: 'empty-row',
+    variable: d[2],
   }) %}
   | %keywords_row %ws %variable %ws:? %equals %ws:? %empty_row {% d => ({
     type: 'empty-row',
@@ -198,6 +225,10 @@ variable_assignment -> %keywords_row %ws %variable %ws:? %equals %ws:? query {% 
     type: 'query-table',
     variable: d[2],
     value: d[6]
+  }) %}
+  | %keywords_table %ws %variable {% d => ({
+    type: 'empty-table',
+    variable: d[2],
   }) %}
   | %keywords_table %ws %variable %ws:? %equals %ws:? %empty_table {% d => ({
     type: 'empty-table',

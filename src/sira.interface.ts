@@ -21,6 +21,9 @@ export type FormSourceTarget = SiraBase.FormSourceTarget<string>;
 export interface SourceTargetText extends SiraBase.SourceTargetText<string> {};
 export interface SourceTargetBigText extends SiraBase.SourceTargetBigText<string> {};
 export interface SourceTargetNumber extends SiraBase.SourceTargetNumber<string> {};
+export interface SourceTargetDatetime extends SiraBase.SourceTargetDatetime<string> {};
+export interface SourceTargetDate extends SiraBase.SourceTargetDate<string> {};
+export interface SourceTargetTime extends SiraBase.SourceTargetTime<string> {};
 export interface SourceTargetDropdown extends SiraBase.SourceTargetDropdown<string> {};
 export interface SourceTargetRadio extends SiraBase.SourceTargetRadio<string> {};
 // View Component > Table
@@ -44,6 +47,9 @@ export interface VariableAssignmentByQueryTable extends SiraBase.VariableAssignm
 export interface VariableAssignmentByQueryRow extends SiraBase.VariableAssignmentByQueryRow<string> {};
 export interface VariableAssignmentByEmptyTable extends SiraBase.VariableAssignmentByEmptyTable<string> {};
 export interface VariableAssignmentByEmptyRow extends SiraBase.VariableAssignmentByEmptyRow<string> {};
+export interface VariableAssignmentByEmptyCell extends SiraBase.VariableAssignmentByEmptyCell<string> {};
+export interface VariableAssignmentByNumericCell extends SiraBase.VariableAssignmentByNumericCell<string> {};
+export interface VariableAssignmentByStringCell extends SiraBase.VariableAssignmentByStringCell<string> {};
 // Query
 export type Query = SiraBase.Query<string>;
 export interface QuerySingleRowParams extends SiraBase.QuerySingleRowParams<string> {};

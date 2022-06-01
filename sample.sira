@@ -3,6 +3,11 @@ page 222 Add Postings   2
     table user_options = query 'user options'
     table postings = []
     row temp = ()
+    row temp2
+    table posss
+    cell num = 1
+    cell str = "   we lcome "
+    cell str2 = "sss"
 
   [view]
     form Choose User
@@ -12,9 +17,13 @@ page 222 Add Postings   2
       - Title: postings.title text
       - Content: postings.content bigtext
       - Number: postings.z numeric
+      - Open Time: postings.t time
+      - TGL: postings.t date
+      - Waktu: postings.t datetime
 
     button Post {
       confirm Yakin?
+      cell a
       query 'insert postings' (source = postings) [
         $1 = temp.user_id,
         $2 = postings.title,

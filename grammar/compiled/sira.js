@@ -25,6 +25,10 @@ const keywords_section_view = [
   '[view]', '[View]',
 ];
 
+const keywords_cell = [
+  'cell', 'Cell',
+];
+
 const keywords_row = [
   'row', 'Row',
 ];
@@ -81,9 +85,22 @@ const keywords_type_numeric = [
   'numeric', 'Numeric'
 ];
 
+const keywords_type_date = [
+  'date', 'Date'
+];
+
+const keywords_type_time = [
+  'time', 'Time'
+];
+
+const keywords_type_datetime = [
+  'datetime', 'DateTime', 'Datetime'
+];
+
 const lexer = moo.compile({
   ws: /[ \t]+/,
   nl: { match: /\n+/, lineBreaks: true },
+  string: /"(?:\\["\\]|[^\n"\\])*"/,
   item_begin: /[\-]/,
   comma: /\,/,
   dot: /\./,
@@ -123,6 +140,7 @@ const lexer = moo.compile({
     match: /[a-zA-Z_][a-zA-Z0-9_]*/,
     type: moo.keywords({
       keywords_page,
+      keywords_cell,
       keywords_row,
       keywords_table,
       keywords_query,
@@ -137,7 +155,10 @@ const lexer = moo.compile({
       keywords_dropdown,
       keywords_radio,
       keywords_button,
-      keywords_multiform
+      keywords_multiform,
+      keywords_type_datetime,
+      keywords_type_date,
+      keywords_type_time
     })
   },
   number: /[0-9]+/,
@@ -234,6 +255,15 @@ var grammar = {
         }) },
     {"name": "form_type", "symbols": [(lexer.has("keywords_type_numeric") ? {type: "keywords_type_numeric"} : keywords_type_numeric)], "postprocess":  d => ({
           type: 'numeric'
+        }) },
+    {"name": "form_type", "symbols": [(lexer.has("keywords_type_datetime") ? {type: "keywords_type_datetime"} : keywords_type_datetime)], "postprocess":  d => ({
+          type: 'datetime'
+        }) },
+    {"name": "form_type", "symbols": [(lexer.has("keywords_type_date") ? {type: "keywords_type_date"} : keywords_type_date)], "postprocess":  d => ({
+          type: 'date'
+        }) },
+    {"name": "form_type", "symbols": [(lexer.has("keywords_type_time") ? {type: "keywords_type_time"} : keywords_type_time)], "postprocess":  d => ({
+          type: 'time'
         }) },
     {"name": "form_type", "symbols": ["form_type_dropdown"], "postprocess":  d => ({
           type: 'dropdown',
@@ -333,8 +363,8 @@ var grammar = {
     {"name": "variable_assignment$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "variable_assignment$ebnf$2", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
     {"name": "variable_assignment$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_row") ? {type: "keywords_row"} : keywords_row), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$1", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$2", "query"], "postprocess":  d => ({
-          type: 'query-row',
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_cell") ? {type: "keywords_cell"} : keywords_cell), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$1", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$2", (lexer.has("string") ? {type: "string"} : string)], "postprocess":  d => ({
+          type: 'string-cell',
           variable: d[2],
           value: d[6]
         }) },
@@ -342,24 +372,54 @@ var grammar = {
     {"name": "variable_assignment$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "variable_assignment$ebnf$4", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
     {"name": "variable_assignment$ebnf$4", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_row") ? {type: "keywords_row"} : keywords_row), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$3", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$4", (lexer.has("empty_row") ? {type: "empty_row"} : empty_row)], "postprocess":  d => ({
-          type: 'empty-row',
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_cell") ? {type: "keywords_cell"} : keywords_cell), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$3", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$4", (lexer.has("number") ? {type: "number"} : number)], "postprocess":  d => ({
+          type: 'numeric-cell',
+          variable: d[2],
+          value: d[6]
+        }) },
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_cell") ? {type: "keywords_cell"} : keywords_cell), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable)], "postprocess":  d => ({
+          type: 'empty-cell',
           variable: d[2],
         }) },
     {"name": "variable_assignment$ebnf$5", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
     {"name": "variable_assignment$ebnf$5", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "variable_assignment$ebnf$6", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
     {"name": "variable_assignment$ebnf$6", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_table") ? {type: "keywords_table"} : keywords_table), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$5", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$6", "query"], "postprocess":  d => ({
-          type: 'query-table',
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_row") ? {type: "keywords_row"} : keywords_row), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$5", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$6", "query"], "postprocess":  d => ({
+          type: 'query-row',
           variable: d[2],
           value: d[6]
+        }) },
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_row") ? {type: "keywords_row"} : keywords_row), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable)], "postprocess":  d => ({
+          type: 'empty-row',
+          variable: d[2],
         }) },
     {"name": "variable_assignment$ebnf$7", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
     {"name": "variable_assignment$ebnf$7", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "variable_assignment$ebnf$8", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
     {"name": "variable_assignment$ebnf$8", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_table") ? {type: "keywords_table"} : keywords_table), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$7", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$8", (lexer.has("empty_table") ? {type: "empty_table"} : empty_table)], "postprocess":  d => ({
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_row") ? {type: "keywords_row"} : keywords_row), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$7", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$8", (lexer.has("empty_row") ? {type: "empty_row"} : empty_row)], "postprocess":  d => ({
+          type: 'empty-row',
+          variable: d[2],
+        }) },
+    {"name": "variable_assignment$ebnf$9", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
+    {"name": "variable_assignment$ebnf$9", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "variable_assignment$ebnf$10", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
+    {"name": "variable_assignment$ebnf$10", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_table") ? {type: "keywords_table"} : keywords_table), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$9", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$10", "query"], "postprocess":  d => ({
+          type: 'query-table',
+          variable: d[2],
+          value: d[6]
+        }) },
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_table") ? {type: "keywords_table"} : keywords_table), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable)], "postprocess":  d => ({
+          type: 'empty-table',
+          variable: d[2],
+        }) },
+    {"name": "variable_assignment$ebnf$11", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
+    {"name": "variable_assignment$ebnf$11", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "variable_assignment$ebnf$12", "symbols": [(lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": id},
+    {"name": "variable_assignment$ebnf$12", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "variable_assignment", "symbols": [(lexer.has("keywords_table") ? {type: "keywords_table"} : keywords_table), (lexer.has("ws") ? {type: "ws"} : ws), (lexer.has("variable") ? {type: "variable"} : variable), "variable_assignment$ebnf$11", (lexer.has("equals") ? {type: "equals"} : equals), "variable_assignment$ebnf$12", (lexer.has("empty_table") ? {type: "empty_table"} : empty_table)], "postprocess":  d => ({
           type: 'empty-table',
           variable: d[2],
         }) },

@@ -46,7 +46,7 @@ export declare namespace SiraBase {
         label: string;
         source_target: FormSourceTarget<T>;
     }
-    type FormSourceTarget<T> = SourceTargetText<T> | SourceTargetBigText<T> | SourceTargetNumber<T> | SourceTargetDropdown<T> | SourceTargetRadio<T>;
+    type FormSourceTarget<T> = SourceTargetText<T> | SourceTargetBigText<T> | SourceTargetNumber<T> | SourceTargetDatetime<T> | SourceTargetDate<T> | SourceTargetTime<T> | SourceTargetDropdown<T> | SourceTargetRadio<T>;
     interface SourceTargetText<T> {
         type: 'text';
         variable: VariableAccess<T>;
@@ -57,6 +57,18 @@ export declare namespace SiraBase {
     }
     interface SourceTargetNumber<T> {
         type: 'numeric';
+        variable: VariableAccess<T>;
+    }
+    interface SourceTargetDatetime<T> {
+        type: 'datetime';
+        variable: VariableAccess<T>;
+    }
+    interface SourceTargetDate<T> {
+        type: 'date';
+        variable: VariableAccess<T>;
+    }
+    interface SourceTargetTime<T> {
+        type: 'time';
         variable: VariableAccess<T>;
     }
     interface SourceTargetDropdown<T> {
@@ -121,7 +133,7 @@ export declare namespace SiraBase {
         page: string;
         params: Param<T>[];
     }
-    type VariableAssignment<T> = VariableAssignmentByQueryTable<T> | VariableAssignmentByQueryRow<T> | VariableAssignmentByEmptyTable<T> | VariableAssignmentByEmptyRow<T>;
+    type VariableAssignment<T> = VariableAssignmentByQueryTable<T> | VariableAssignmentByEmptyTable<T> | VariableAssignmentByQueryRow<T> | VariableAssignmentByEmptyRow<T> | VariableAssignmentByNumericCell<T> | VariableAssignmentByStringCell<T> | VariableAssignmentByEmptyCell<T>;
     interface VariableAssignmentByQueryTable<T> {
         type: 'query-table';
         variable: T;
@@ -138,6 +150,20 @@ export declare namespace SiraBase {
     }
     interface VariableAssignmentByEmptyRow<T> {
         type: 'empty-row';
+        variable: T;
+    }
+    interface VariableAssignmentByStringCell<T> {
+        type: 'string-cell';
+        variable: T;
+        value: T;
+    }
+    interface VariableAssignmentByNumericCell<T> {
+        type: 'numeric-cell';
+        variable: T;
+        value: T;
+    }
+    interface VariableAssignmentByEmptyCell<T> {
+        type: 'empty-cell';
         variable: T;
     }
     type Query<T> = QuerySingleRowParams<T> | QueryMultiRowParams<T> | QueryEmptyParams<T>;

@@ -1,7 +1,7 @@
 import * as nearley from "nearley";
 import { injectIndent } from "./indentation.utility";
 import { SiraIntermediate } from "./intermediate.interface";
-import { ItemForm, ItemTable, ItemTableCell, PageSection, Param, ParamByParam, ParamByVariableAccess, Query, QueryEmptyParams, QueryMultiRowParams, QuerySingleRowParams, SectionData, SectionParam, SectionView, SiraPage, SourceTargetBigText, SourceTargetDropdown, SourceTargetNumber, SourceTargetRadio, SourceTargetText, Statement, StatementAlert, StatementConfirm, StatementGoto, StatementQuery, StatementVariableAssignment, VariableAssignment, VariableAssignmentByEmptyRow, VariableAssignmentByEmptyTable, VariableAssignmentByQueryRow, VariableAssignmentByQueryTable, ViewComponentButton, ViewComponentForm, ViewComponentMultiform, ViewComponentTable } from "./sira.interface";
+import { ItemForm, ItemTable, ItemTableCell, PageSection, Param, ParamByParam, ParamByVariableAccess, Query, QueryEmptyParams, QueryMultiRowParams, QuerySingleRowParams, SectionData, SectionParam, SectionView, SiraPage, SourceTargetBigText, SourceTargetDate, SourceTargetDatetime, SourceTargetDropdown, SourceTargetNumber, SourceTargetRadio, SourceTargetText, SourceTargetTime, Statement, StatementAlert, StatementConfirm, StatementGoto, StatementQuery, StatementVariableAssignment, VariableAssignment, VariableAssignmentByEmptyCell, VariableAssignmentByEmptyRow, VariableAssignmentByEmptyTable, VariableAssignmentByNumericCell, VariableAssignmentByQueryRow, VariableAssignmentByQueryTable, VariableAssignmentByStringCell, ViewComponentButton, ViewComponentForm, ViewComponentMultiform, ViewComponentTable } from "./sira.interface";
 
 export class SiraParser {
   public result: SiraPage;
@@ -73,6 +73,23 @@ export class SiraParser {
   private processVariableAssignments(vas: SiraIntermediate.VariableAssignment[]): VariableAssignment[] {
     return vas.map((va: SiraIntermediate.VariableAssignment) => {
       switch (va.type) {
+        case 'numeric-cell':
+          return {
+            type: 'numeric-cell',
+            variable: va.variable.value,
+            value: parseInt(va.value.value) as any
+          } as VariableAssignmentByNumericCell;
+        case 'string-cell':
+          return {
+            type: 'string-cell',
+            variable: va.variable.value,
+            value: va.value.value.replace(/^"(.*)"$/, '$1')
+          } as VariableAssignmentByStringCell;
+        case 'empty-cell':
+          return {
+            type: 'empty-cell',
+            variable: va.variable.value
+          } as VariableAssignmentByEmptyCell;
         case 'empty-row':
           return {
             type: 'empty-row',
@@ -140,6 +157,9 @@ export class SiraParser {
         case 'text':
         case 'bigtext':
         case 'numeric':
+        case 'datetime':
+        case 'date':
+        case 'time':
           return {
             label: itf.label,
             source_target: {
@@ -148,7 +168,7 @@ export class SiraParser {
                 table: itf.source_target.variable.table.value,
                 column: itf.source_target.variable.column.value
               }
-            } as (SourceTargetText | SourceTargetBigText | SourceTargetNumber)
+            } as (SourceTargetText | SourceTargetBigText | SourceTargetNumber | SourceTargetDatetime | SourceTargetDate | SourceTargetTime)
           }
         case 'dropdown':
         case 'radio':

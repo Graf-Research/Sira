@@ -63,6 +63,9 @@ export namespace SiraBase {
   export type FormSourceTarget<T> = SourceTargetText<T>
     | SourceTargetBigText<T>
     | SourceTargetNumber<T>
+    | SourceTargetDatetime<T>
+    | SourceTargetDate<T>
+    | SourceTargetTime<T>
     | SourceTargetDropdown<T>
     | SourceTargetRadio<T>;
 
@@ -76,6 +79,18 @@ export namespace SiraBase {
   }
   export interface SourceTargetNumber<T> {
     type: 'numeric'
+    variable: VariableAccess<T>
+  }
+  export interface SourceTargetDatetime<T> {
+    type: 'datetime'
+    variable: VariableAccess<T>
+  }
+  export interface SourceTargetDate<T> {
+    type: 'date'
+    variable: VariableAccess<T>
+  }
+  export interface SourceTargetTime<T> {
+    type: 'time'
     variable: VariableAccess<T>
   }
   export interface SourceTargetDropdown<T> {
@@ -153,9 +168,12 @@ export namespace SiraBase {
 
   // Variable Assignment
   export type VariableAssignment<T> = VariableAssignmentByQueryTable<T>
-    | VariableAssignmentByQueryRow<T>
     | VariableAssignmentByEmptyTable<T>
-    | VariableAssignmentByEmptyRow<T>;
+    | VariableAssignmentByQueryRow<T>
+    | VariableAssignmentByEmptyRow<T>
+    | VariableAssignmentByNumericCell<T>
+    | VariableAssignmentByStringCell<T>
+    | VariableAssignmentByEmptyCell<T>;
   export interface VariableAssignmentByQueryTable<T> {
     type: 'query-table'
     variable: T
@@ -172,6 +190,20 @@ export namespace SiraBase {
   }
   export interface VariableAssignmentByEmptyRow<T> {
     type: 'empty-row'
+    variable: T
+  }
+  export interface VariableAssignmentByStringCell<T> {
+    type: 'string-cell'
+    variable: T
+    value: T
+  }
+  export interface VariableAssignmentByNumericCell<T> {
+    type: 'numeric-cell'
+    variable: T
+    value: T
+  }
+  export interface VariableAssignmentByEmptyCell<T> {
+    type: 'empty-cell'
     variable: T
   }
 

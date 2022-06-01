@@ -30,6 +30,12 @@ export interface SourceTargetBigText extends SiraBase.SourceTargetBigText<string
 }
 export interface SourceTargetNumber extends SiraBase.SourceTargetNumber<string> {
 }
+export interface SourceTargetDatetime extends SiraBase.SourceTargetDatetime<string> {
+}
+export interface SourceTargetDate extends SiraBase.SourceTargetDate<string> {
+}
+export interface SourceTargetTime extends SiraBase.SourceTargetTime<string> {
+}
 export interface SourceTargetDropdown extends SiraBase.SourceTargetDropdown<string> {
 }
 export interface SourceTargetRadio extends SiraBase.SourceTargetRadio<string> {
@@ -64,6 +70,12 @@ export interface VariableAssignmentByQueryRow extends SiraBase.VariableAssignmen
 export interface VariableAssignmentByEmptyTable extends SiraBase.VariableAssignmentByEmptyTable<string> {
 }
 export interface VariableAssignmentByEmptyRow extends SiraBase.VariableAssignmentByEmptyRow<string> {
+}
+export interface VariableAssignmentByEmptyCell extends SiraBase.VariableAssignmentByEmptyCell<string> {
+}
+export interface VariableAssignmentByNumericCell extends SiraBase.VariableAssignmentByNumericCell<string> {
+}
+export interface VariableAssignmentByStringCell extends SiraBase.VariableAssignmentByStringCell<string> {
 }
 export declare type Query = SiraBase.Query<string>;
 export interface QuerySingleRowParams extends SiraBase.QuerySingleRowParams<string> {
