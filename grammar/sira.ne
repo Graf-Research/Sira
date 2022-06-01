@@ -148,6 +148,9 @@ vc_table_item_button -> %item_begin %ws:? STR %ws:? %open_bracket OPEN_TAG state
 table_type -> %keywords_type_text {% id %}
   | %keywords_type_bigtext {% id %}
   | %keywords_type_numeric {% id %}
+  | %keywords_type_datetime {% id %}
+  | %keywords_type_date {% id %}
+  | %keywords_type_time {% id %}
 
 
 # Data Source
