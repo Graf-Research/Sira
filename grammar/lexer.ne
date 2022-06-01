@@ -81,7 +81,6 @@ const lexer = moo.compile({
   ws: /[ \t]+/,
   nl: { match: /\n+/, lineBreaks: true },
   item_begin: /[\-]/,
-  number: /[0-9]+/,
   comma: /\,/,
   dot: /\./,
   colon: /\:/,
@@ -137,6 +136,7 @@ const lexer = moo.compile({
       keywords_multiform
     })
   },
+  number: /[0-9]+/,
   any: /.+/
 });
 %}
