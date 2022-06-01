@@ -1,7 +1,7 @@
 import * as nearley from "nearley";
 import { injectIndent } from "./indentation.utility";
 import { SiraIntermediate } from "./intermediate.interface";
-import { ItemForm, ItemTable, ItemTableCell, PageSection, Param, ParamByParam, ParamByVariableAccess, Query, QueryEmptyParams, QueryMultiRowParams, QuerySingleRowParams, SectionData, SectionParam, SectionView, SiraPage, SourceTargetBigText, SourceTargetDropdown, SourceTargetNumber, SourceTargetRadio, SourceTargetText, Statement, StatementAlert, StatementConfirm, StatementGoto, StatementQuery, StatementVariableAssignment, VariableAssignment, VariableAssignmentByEmptyRow, VariableAssignmentByEmptyTable, VariableAssignmentByQueryRow, VariableAssignmentByQueryTable, ViewComponentButton, ViewComponentForm, ViewComponentTable } from "./sira.interface";
+import { ItemForm, ItemTable, ItemTableCell, PageSection, Param, ParamByParam, ParamByVariableAccess, Query, QueryEmptyParams, QueryMultiRowParams, QuerySingleRowParams, SectionData, SectionParam, SectionView, SiraPage, SourceTargetBigText, SourceTargetDropdown, SourceTargetNumber, SourceTargetRadio, SourceTargetText, Statement, StatementAlert, StatementConfirm, StatementGoto, StatementQuery, StatementVariableAssignment, VariableAssignment, VariableAssignmentByEmptyRow, VariableAssignmentByEmptyTable, VariableAssignmentByQueryRow, VariableAssignmentByQueryTable, ViewComponentButton, ViewComponentForm, ViewComponentMultiform, ViewComponentTable } from "./sira.interface";
 
 export class SiraParser {
   public result: SiraPage;
@@ -225,7 +225,6 @@ export class SiraParser {
                       }
                     } as ViewComponentButton;
                   case 'form':
-                  case 'multiform':
                     return {
                       type: vc.type,
                       data: {
@@ -233,6 +232,15 @@ export class SiraParser {
                         items: this.processItemForms(vc.data.items)
                       }
                     } as ViewComponentForm;
+                  case 'multiform':
+                    return {
+                      type: vc.type,
+                      data: {
+                        name: vc.data.name,
+                        source_target: vc.data.source_target.value,
+                        items: this.processItemForms(vc.data.items)
+                      }
+                    } as ViewComponentMultiform;
                   case 'table':
                     return {
                       type: 'table',
