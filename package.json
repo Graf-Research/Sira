@@ -31,5 +31,11 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["lib/**/*", "grammar/**/*.js"]
+  "files": [
+    "lib/**/*",
+    "grammar/**/*.js"
+  ],
+  "dependencies": {
+    "moo": "^0.5.1"
+  }
 }
